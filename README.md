@@ -17,7 +17,7 @@
 | 层 | 技术 |
 |---|------|
 | 后端框架 | FastAPI (Python 3.11) |
-| 数据库 | PostgreSQL 17 + SQLAlchemy ORM |
+| 数据库 | PostgreSQL 17（使用 Neon 免费云数据库，无需本地安装） + SQLAlchemy ORM |
 | 认证 | JWT (python-jose) + bcrypt |
 | 包管理 | uv |
 | 前端框架 | React 19 + TypeScript |
@@ -74,7 +74,16 @@ stop.bat                # Windows 停止脚本
 
 - Python 3.11+
 - Node.js 24+
-- PostgreSQL 17
+- 无需本地安装 PostgreSQL！项目使用 Neon 免费云数据库。
+
+### 首次配置（必须）
+
+```bash
+cd backend
+cp .env.example .env
+# 编辑 .env，填入你的 Neon 连接字符串和 SECRET_KEY
+# 如果没有 Neon 账号，去 https://neon.tech 免费注册
+```
 
 ### Windows 一键启动（推荐）
 
@@ -85,16 +94,12 @@ stop.bat                # Windows 停止脚本
 ### 手动启动
 
 ```bash
-# 终端 1：启动 PostgreSQL
-pg_ctl -D /path/to/pgdata -l /path/to/logfile -o "-p 5433" start
-
-# 终端 2：启动后端
+# 终端 1：启动后端
 cd backend
-cp .env.example .env       # 首次运行
 uv sync
 uv run uvicorn app.main:app --reload
 
-# 终端 3：启动前端
+# 终端 2：启动前端
 cd frontend
 npm install                # 首次运行
 npm run dev
@@ -105,6 +110,8 @@ npm run dev
 ### Docker 一键启动
 
 ```bash
+# 1. 先配置 backend/.env（参考上面的"首次配置"）
+# 2. 启动
 docker compose up -d
 
 # 前端：http://localhost
@@ -112,9 +119,18 @@ docker compose up -d
 # API 文档：http://localhost:8000/docs
 ```
 
+Docker Compose 只启动 backend + frontend 两个服务，数据库直接连 Neon 云端。
+
 ## 🧪 测试
 
 ```bash
+# 测试需要本地 PostgreSQL（因为测试不应该用共享数据库）
+# 先确保本地 PostgreSQL 运行在 5432 端口
+
+# 创建测试数据库
+createdb -p 5432 -U postgres internship_tracker_test
+
+# 运行测试
 cd backend
 uv run pytest -v          # 64 个测试
 
@@ -151,41 +167,35 @@ uv run pytest -v
 
 ## 🌐 免费部署到公网（让别人也能用）
 
-使用 **Neon**（永久免费 PostgreSQL）+ **Render**（免费 Web 服务）。
+项目已配置好 **Neon**（免费云数据库）+ **Render**（免费部署）。
 
-### 准备
+### 第一步：Push 到 GitHub
 
-1. 注册 [GitHub](https://github.com) 账号，把项目 push 上去
-2. 注册 [Render](https://render.com) 账号，用 GitHub 登录
-3. 注册 [Neon](https://neon.tech) 账号
+```bash
+git init
+git add .
+git commit -m "Ready for Render"
+git remote add origin https://github.com/你的用户名/仓库名.git
+git push -u origin main
+```
 
-### 步骤
+### 第二步：Render 一键部署
 
-#### 1. 在 Neon 创建数据库
+1. 注册 [Render](https://render.com)，用 GitHub 登录
+2. Render 控制台 → **New** → **Blueprint**
+3. 选择刚才 push 的 GitHub 仓库
+4. Render 自动读取 `render.yaml`，创建 backend + frontend 两个服务
 
-- 登录 Neon → New Project → 起个名 → Create
-- 复制 **Connection string**（格式：`postgresql://user:pass@host/db`）
+### 第三步：配置数据库
 
-#### 2. 在 Render 部署
+部署完成后，backend 服务需要知道 Neon 数据库地址：
 
-- Render → New → **PostgreSQL** → 粘贴 Neon 的 Connection string
-- Render → New → **Web Service** → 选 GitHub 仓库 → 选择 backend 目录
-  - Build Command: `pip install -r requirements.txt`
-  - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-  - Environment: 添加 `DATABASE_URL` = Neon 的 Connection string
-  - 添加 `SECRET_KEY` = 随便填一串英文数字
-  - 添加 `PYTHON_VERSION` = `3.11.0`
-- Render → New → **Static Site** → 选 GitHub 仓库 → 选择 frontend 目录
-  - Build Command: `npm install && npm run build`
-  - Publish Directory: `dist`
-  - Environment: 添加 `VITE_API_URL` = 上面 Backend 的 URL（如 `https://xxx.onrender.com`）
-  - Rewrite Rules: `/*` → `/index.html`
+1. Render 控制台 → 点击 **internship-tracker-api** 服务
+2. 左侧菜单 → **Environment**
+3. 找到 `DATABASE_URL`，把值改为你的 Neon 连接字符串
+4. 点击 **Save Changes**，Render 会自动重启服务
 
-#### 3. 完成
-
-等 3-5 分钟部署完毕，访问 Static Site 的 URL（如 `https://xxx.onrender.com`）。
-
-别人就能通过这个链接使用你的系统了！
+等 3-5 分钟，访问前端 URL（如 `https://internship-tracker-frontend-xxx.onrender.com`），别人就能用了！
 
 ## 📄 License
 

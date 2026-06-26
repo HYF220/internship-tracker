@@ -1,40 +1,20 @@
 # ==================== Docker Compose ====================
-# 一键启动整个项目：postgres + backend + frontend
+# 一键启动：backend + frontend（数据库使用 Neon 云端 PostgreSQL）
 #
 # 使用方法：
-#   docker compose up -d        # 后台启动
-#   docker compose down         # 停止并删除容器
-#   docker compose logs -f      # 查看日志
+#   1. 先配置 backend/.env（复制 .env.example 并填入 Neon 连接字符串）
+#   2. docker compose up -d        # 后台启动
+#   3. docker compose down         # 停止并删除容器
+#   4. docker compose logs -f      # 查看日志
 
 version: "3.9"
 
 services:
-  # ========== 数据库 ==========
-  postgres:
-    image: postgres:17-alpine
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: internship_tracker
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   # ========== 后端 API ==========
   backend:
     build: ./backend
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/internship_tracker
-      SECRET_KEY: change-this-to-a-random-secret-key-in-production
+    env_file:
+      - ./backend/.env
     ports:
       - "8000:8000"
     volumes:
@@ -49,5 +29,4 @@ services:
       - "80:80"
 
 volumes:
-  postgres_data:
   uploads:

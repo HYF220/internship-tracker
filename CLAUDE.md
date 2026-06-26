@@ -60,20 +60,21 @@
 ### 前置条件
 - Python 3.11+
 - Node.js 24+
-- PostgreSQL 17
+- 无需本地 PostgreSQL！使用 Neon 云端数据库
 
 ### 启动方式
 
 ```bash
-# 终端 1：启动 PostgreSQL（端口 5433）
-pg_ctl -D /d/pgdata -l /d/pgdata/logfile -o "-p 5433" start
-
-# 终端 2：启动后端（端口 8000）
+# 首次：配置环境变量
 cd backend
-cp .env.example .env  # 首次需要
+cp .env.example .env  # 复制模板
+# 编辑 .env，填入 Neon 连接字符串和 SECRET_KEY
+
+# 终端 1：启动后端（端口 8000）
+cd backend
 uv run uvicorn app.main:app --reload
 
-# 终端 3：启动前端（端口 5173）
+# 终端 2：启动前端（端口 5173）
 cd frontend
 npm run dev
 ```
@@ -94,11 +95,12 @@ uv run pytest -v    # 64 个测试
 ## Docker 部署（一键启动）
 
 ```bash
+# 先配置 backend/.env（复制 .env.example 并填入 Neon 连接字符串）
 # 项目根目录
 docker compose up -d
 ```
 
-启动后：
+启动后（只有 backend + frontend 两个容器，数据库连 Neon 云端）：
 - 前端：http://localhost
 - 后端 API：http://localhost:8000
 - API 文档：http://localhost:8000/docs

@@ -17,6 +17,13 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+# ==================== 启动前加载 ====================
+
+# ⚠️ 必须在导入 app.* 模块之前加载 .env！
+# 因为 auth.py、database.py 等模块在导入时就会读取环境变量。
+# 如果 .env 还没加载，它们会拿到空值并使用不安全的默认值。
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
 from app.database import engine, Base, get_db
 from app.models import User
 from app.schemas import (
@@ -35,10 +42,6 @@ from app.schemas import (
 )
 from app.auth import verify_password, create_access_token, get_current_user
 from app import crud
-
-# ==================== 启动前加载 ====================
-
-load_dotenv()
 
 
 @asynccontextmanager

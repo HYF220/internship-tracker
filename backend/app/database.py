@@ -2,7 +2,7 @@
 数据库连接模块
 
 这个文件负责：
-1. 连接到 PostgreSQL 数据库
+1. 连接到 PostgreSQL 数据库（支持 Neon Serverless PostgreSQL）
 2. 管理"会话"（Session）—— 每次请求借一个连接，用完归还
 3. 提供 get_db 函数，供接口使用
 
@@ -11,10 +11,12 @@
     "连接"   = 就像打电话，拨通后可以说很多句话（执行多条 SQL）
     "会话"   = 一次通话过程
     "连接池" = 预先把几个电话拨通等着，来请求了就分配一个
+    Neon     = 云端 PostgreSQL，不需要在自己电脑装数据库
 ============================================================
 """
 
 import os
+import re
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
@@ -23,8 +25,14 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 # 如果找不到，就用默认值（方便开发时不用每次设环境变量）
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres@localhost:5433/internship_tracker",
+    "postgresql://postgres@localhost:5432/internship_tracker",
 )
+
+# Neon（云端 PostgreSQL）的连接字符串自带 channel_binding=require 参数。
+# 这个参数是 SCRAM 通道绑定，只有 Neon 自己的代理支持，psycopg2 不认识它。
+# 如果直接传给 psycopg2 会报错：channel_binding=require is not supported
+# 所以这里用正则把它去掉，不影响 sslmode=require（psycopg2 可以正常处理）
+DATABASE_URL = re.sub(r'[?&]channel_binding=require', '', DATABASE_URL)
 
 # engine = 数据库引擎，负责和 PostgreSQL 通信
 # pool_size=5 表示最多保持 5 个空闲连接
