@@ -6,13 +6,6 @@
  * 2. 封装所有后端 API 调用
  */
 
-// ==================== 配置 ====================
-
-// 后端 API 地址
-// 本地开发时为空（Vite 会自动代理到 localhost:8000）
-// 部署时设置为 Render 后端地址，如 https://xxx.onrender.com
-const BASE_URL = import.meta.env.VITE_API_URL || "";
-
 // ==================== Token 管理 ====================
 
 const TOKEN_KEY = "auth_token";
@@ -56,7 +49,7 @@ async function request(method: string, path: string, body?: object): Promise<Res
     options.body = body instanceof FormData ? body : JSON.stringify(body);
   }
 
-  const response = await fetch(BASE_URL + path, options);
+  const response = await fetch(path, options);
 
   // 如果 token 过期，清除并跳转登录页
   if (response.status === 401) {

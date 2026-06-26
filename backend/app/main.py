@@ -12,17 +12,9 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-
-# ==================== 启动前加载 ====================
-
-# ⚠️ 必须在导入 app.* 模块之前加载 .env！
-# 因为 auth.py、database.py 等模块在导入时就会读取环境变量。
-# 如果 .env 还没加载，它们会拿到空值并使用不安全的默认值。
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 from app.database import engine, Base, get_db
 from app.models import User
@@ -43,6 +35,10 @@ from app.schemas import (
 from app.auth import verify_password, create_access_token, get_current_user
 from app import crud
 
+# ==================== 启动前加载 ====================
+
+load_dotenv()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -61,19 +57,6 @@ app = FastAPI(
     description="管理实习投递的 Web API",
     version="0.3.0",
     lifespan=lifespan,
-)
-
-# ==================== CORS 跨域 ====================
-
-# 允许前端从任何地址访问后端 API
-# 本地开发：localhost:5173
-# 生产部署：Render 自动分配的域名
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # 生产环境可以改为具体域名
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
 )
 
 

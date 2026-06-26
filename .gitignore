@@ -1,33 +1,26 @@
+# IDE
+.vscode/
+
 # Python
 __pycache__/
-*.py[cod]
-*.egg-info/
+*.pyc
 .venv/
-.pytest_cache/
-
-# Node
-node_modules/
-dist/
 
 # Environment
 .env
-!.env.example
 
-# PostgreSQL data
-*.sql
+# Uploads (test artifacts)
+backend/uploads/*.pdf
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Docker
 pgdata/
 
-# IDE
-.vscode/
-.idea/
-
-# Uploads (keep folder, ignore files)
-backend/uploads/*
-!backend/uploads/.gitkeep
-
-# OS
+# macOS
 .DS_Store
-Thumbs.db
 
-# Word temp files
-~$*.docx
+# Temp files
+~$*

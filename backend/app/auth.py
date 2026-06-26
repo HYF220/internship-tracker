@@ -13,7 +13,6 @@
 """
 
 import os
-import warnings
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
@@ -28,15 +27,7 @@ from app.models import User
 # ==================== 配置 ====================
 
 # 密钥 —— 用于签名 JWT。实际部署时应该放在环境变量中
-SECRET_KEY = os.getenv("SECRET_KEY")
-if SECRET_KEY is None:
-    warnings.warn(
-        "⚠️  SECRET_KEY 未设置！使用不安全的默认值。\n"
-        "    请在 backend/.env 中设置 SECRET_KEY=你的随机字符串\n"
-        "    生成方式: python -c \"import secrets; print(secrets.token_urlsafe(32))\"",
-        RuntimeWarning,
-    )
-    SECRET_KEY = "dev-secret-key-change-in-production"
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60  # token 有效期：60 分钟
 
