@@ -130,23 +130,23 @@ docker compose up -d
 
 ## 📡 API 接口
 
-| 方法 | 路径 | 说明 | 认证 |
+| 方法 | 路径 | 说明 | 需登录 |
 |------|------|------|------|
-| GET | `/health` | 健康检查 | ❌ |
-| POST | `/auth/register` | 注册 | ❌ |
-| POST | `/auth/login` | 登录 | ❌ |
-| GET | `/auth/me` | 当前用户信息 | ✅ |
-| POST | `/jobs` | 创建岗位 | ✅ |
-| GET | `/jobs` | 岗位列表 | ✅ |
-| GET | `/jobs/{id}` | 岗位详情 | ✅ |
-| PUT | `/jobs/{id}` | 更新岗位 | ✅ |
-| DELETE | `/jobs/{id}` | 删除岗位 | ✅ |
-| POST | `/applications` | 创建投递 | ✅ |
-| GET | `/applications` | 投递列表 | ✅ |
-| PUT | `/applications/{id}` | 更新投递 | ✅ |
-| POST | `/resumes/upload` | 上传简历 | ✅ |
-| GET | `/resumes` | 简历列表 | ✅ |
-| GET | `/stats/summary` | 数据统计 | ✅ |
+| GET | `/health` | 健康检查 | -- |
+| POST | `/auth/register` | 注册 | -- |
+| POST | `/auth/login` | 登录 | -- |
+| GET | `/auth/me` | 当前用户信息 | 是 |
+| POST | `/jobs` | 创建岗位 | 是 |
+| GET | `/jobs` | 岗位列表 | 是 |
+| GET | `/jobs/{id}` | 岗位详情 | 是 |
+| PUT | `/jobs/{id}` | 更新岗位 | 是 |
+| DELETE | `/jobs/{id}` | 删除岗位 | 是 |
+| POST | `/applications` | 创建投递 | 是 |
+| GET | `/applications` | 投递列表 | 是 |
+| PUT | `/applications/{id}` | 更新投递 | 是 |
+| POST | `/resumes/upload` | 上传简历 | 是 |
+| GET | `/resumes` | 简历列表 | 是 |
+| GET | `/stats/summary` | 数据统计 | 是 |
 
 启动后端后访问 **http://localhost:8000/docs** 查看完整 API 文档。
 
